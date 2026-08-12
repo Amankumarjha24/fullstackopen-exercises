@@ -4,13 +4,18 @@ import Filter from "./component/Filter";
 import PersonForm from "./component/PersonForm";
 import Persons from "./component/Persons";
 import Server from "./server";
+import Success from "./component/Success";
+import Error from "./component/Error";
 const App = () => {
+  
   console.log(Server);
   console.log(import.meta.url);
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [errormsg, setError] = useState("");
+  const [error, seterror] = useState("")
 
   useEffect(() => {
     const request = Server.getAll();
@@ -53,13 +58,23 @@ const App = () => {
         Server.update(isDuplicate.id, changedPerson)
           .then((response) => {
             console.log(response);
+            setError(`${response.name} mobile no has been changed!`)
+            setTimeout(() => {
+              setError(null)
+            }, 3000);
             setPersons(
               persons.map((value) =>
                 value.id == isDuplicate.id ? response : value,
               ),
             );
           })
-          .catch((error) => alert(error));
+          .catch(() => {
+            seterror(`Information of ${changedPerson.name} has already been removed from server`)
+            setTimeout(() => {
+              seterror(null)
+            }, 3000);
+            setPersons(persons.filter((p)=> p.id !== isDuplicate.id))
+          });
       }
       return;
     }
@@ -69,9 +84,13 @@ const App = () => {
       number: newNumber,
     };
 
-    Server.sendData(newPersonObject).then((response) =>
-      setPersons(persons.concat(response)),
-    );
+    Server.sendData(newPersonObject).then((response) => {
+      setError(`Added ${response.name} `)
+      setTimeout(() => {
+        setError(null)
+      }, 3000);
+      setPersons(persons.concat(response))
+    } );
     setNewName("");
     setNewNumber("");
   }
@@ -99,6 +118,8 @@ const App = () => {
     <div className="box">
       <h2>Phonebook</h2>
       <Filter search={search} getSearch={getSearch} />
+      <Success errormsg={errormsg}/>
+      <Error error={error}/>
       <br />
       <br />
       <h3>Add a New</h3>
