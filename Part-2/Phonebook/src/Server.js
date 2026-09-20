@@ -1,11 +1,13 @@
 import axios from "axios";
 console.log("SERVER FILE LOADED");
-const baseUrl = "http://localhost:3001/persons";
+const baseUrl = "https://fullstackopen-exercises-tiwx.onrender.com/api/notes";
+
 
 const getAll = () => {
-  const data = axios.get(baseUrl).then((Response) => Response.data);
-  return data;
-};
+  const request = axios.get(baseUrl)
+  return request.then(response => response.data)
+}
+
 
 const sendData = (obj) => {
   const postData = axios.post(baseUrl, obj).then((Response) => Response.data);
